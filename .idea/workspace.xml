@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1d6594b7-a178-4b50-a5ed-db20483453c9" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc.go" beforeDir="false" afterPath="$PROJECT_DIR$/doc.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,8 +16,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/redis.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="337">
-              <caret line="174" column="38" lean-forward="true" selection-start-line="174" selection-start-column="38" selection-end-line="174" selection-end-column="38" />
+            <state relative-caret-position="3960">
+              <caret line="174" column="38" selection-start-line="174" selection-start-column="38" selection-end-line="174" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -24,7 +25,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/internal/pool/conn.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
+            <state relative-caret-position="432">
               <caret line="25" column="5" selection-start-line="25" selection-start-column="5" selection-end-line="25" selection-end-column="5" />
               <folding>
                 <element signature="e#14#113#0" expanded="true" />
@@ -36,8 +37,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/internal/pool/pool.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="157" column="30" lean-forward="true" selection-start-line="157" selection-start-column="30" selection-end-line="157" selection-end-column="30" />
+            <state relative-caret-position="5856">
+              <caret line="244" column="41" lean-forward="true" selection-start-line="244" selection-start-column="41" selection-end-line="244" selection-end-column="41" />
               <folding>
                 <element signature="e#14#125#0" expanded="true" />
               </folding>
@@ -46,18 +47,23 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+        <entry file="file://$PROJECT_DIR$/doc.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+            <state relative-caret-position="120">
+              <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/go.mod">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/options.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
+            <state relative-caret-position="5256">
               <caret line="232" column="12" selection-start-line="232" selection-start-column="12" selection-end-line="232" selection-end-column="12" />
             </state>
           </provider>
@@ -66,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cluster.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
+            <state relative-caret-position="24240">
               <caret line="1027" column="60" selection-start-line="1027" selection-start-column="60" selection-end-line="1027" selection-end-column="60" />
             </state>
           </provider>
@@ -98,8 +104,9 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/redis.go" />
-        <option value="$PROJECT_DIR$/internal/pool/pool.go" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/internal/pool/pool.go" />
+        <option value="$PROJECT_DIR$/doc.go" />
       </list>
     </option>
   </component>
@@ -115,18 +122,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="redis-master" type="b2602c69:ProjectViewProjectNode" />
-              <item name="redis-master" type="462c0819:PsiDirectoryNode" />
+              <item name="read-goredis" type="b2602c69:ProjectViewProjectNode" />
+              <item name="read-goredis" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -156,7 +163,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14872068" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15031983" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -358,28 +365,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/redis.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="174" column="38" lean-forward="true" selection-start-line="174" selection-start-column="38" selection-end-line="174" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cluster.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="1027" column="60" selection-start-line="1027" selection-start-column="60" selection-end-line="1027" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/options.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="232" column="12" selection-start-line="232" selection-start-column="12" selection-end-line="232" selection-end-column="12" />
+        <state relative-caret-position="3960">
+          <caret line="174" column="38" selection-start-line="174" selection-start-column="38" selection-end-line="174" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/internal/pool/conn.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
+        <state relative-caret-position="432">
           <caret line="25" column="5" selection-start-line="25" selection-start-column="5" selection-end-line="25" selection-end-column="5" />
           <folding>
             <element signature="e#14#113#0" expanded="true" />
@@ -387,20 +380,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/options.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5256">
+          <caret line="232" column="12" selection-start-line="232" selection-start-column="12" selection-end-line="232" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cluster.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24240">
+          <caret line="1027" column="60" selection-start-line="1027" selection-start-column="60" selection-end-line="1027" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/go.mod">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/internal/pool/pool.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="157" column="30" lean-forward="true" selection-start-line="157" selection-start-column="30" selection-end-line="157" selection-end-column="30" />
+        <state relative-caret-position="5856">
+          <caret line="244" column="41" lean-forward="true" selection-start-line="244" selection-start-column="41" selection-end-line="244" selection-end-column="41" />
           <folding>
             <element signature="e#14#125#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/doc.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+        <state relative-caret-position="120">
+          <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
         </state>
       </provider>
     </entry>
