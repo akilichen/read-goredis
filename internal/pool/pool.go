@@ -89,16 +89,16 @@ func NewConnPool(opt *Options) *ConnPool { // 初始化redis连接池
 		opt: opt,
 
 		queue:     make(chan struct{}, opt.PoolSize), // 存储正在工作的连接队列
-		conns:     make([]*Conn, 0, opt.PoolSize), //存储连接队列
-		idleConns: make([]*Conn, 0, opt.PoolSize), //存储空闲队列
-		closedCh:  make(chan struct{}),            // 用于通知连接池关闭队列，用于通知所有被创建的子协程
+		conns:     make([]*Conn, 0, opt.PoolSize),    //存储连接队列
+		idleConns: make([]*Conn, 0, opt.PoolSize),    //存储空闲队列
+		closedCh:  make(chan struct{}),               // 用于通知连接池关闭队列，用于通知所有被创建的子协程
 	}
 
 	p.checkMinIdleConns() //检查连接池中的空闲连接的数量，若小于则创建足够的空闲连接
 
 	// 若连接池配置中指定了具体的空闲连接超时时间和检查空闲连接频率，启动一个协程用于清理空闲协程
 	if opt.IdleTimeout > 0 && opt.IdleCheckFrequency > 0 {
-		go p.reaper(opt.IdleCheckFrequency)// 清理协程
+		go p.reaper(opt.IdleCheckFrequency) // 清理协程
 	}
 
 	return p
@@ -129,8 +129,8 @@ func (p *ConnPool) addIdleConn() error {
 		return err
 	}
 
-	p.connsMu.Lock() // 连接池队列上锁
-	p.conns = append(p.conns, cn) // 将新创建的连接放入连接池
+	p.connsMu.Lock()                      // 连接池队列上锁
+	p.conns = append(p.conns, cn)         // 将新创建的连接放入连接池
 	p.idleConns = append(p.idleConns, cn) //将新创建的连接放入空闲连接池
 	p.connsMu.Unlock()
 	return nil
@@ -269,7 +269,7 @@ func (p *ConnPool) waitTurn(ctx context.Context) error {
 	}
 
 	select {
-	case p.queue <- struct{}{}:
+	case p.queue <- struct{}{}: // ？
 		return nil
 	default:
 	}
