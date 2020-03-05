@@ -152,6 +152,8 @@ func (p *ConnPool) newConn(ctx context.Context, pooled bool) (*Conn, error) {
 	if pooled {
 		// If pool is full remove the cn on next Put.
 		// 连接池超过配置的连接池连接数据最大值，pooled不被设置为true，该连接将会在下次放置连接时被移除
+		// 解释下不先判断是否满再创建，这样不是省去移除步骤么？是因为有时确实需要一个连接，如连接满了，需要一个
+		// 暂时性的连接来被临时创建使用。
 		if p.poolSize >= p.opt.PoolSize {
 			cn.pooled = false
 		} else {
@@ -230,27 +232,27 @@ func (p *ConnPool) Get(ctx context.Context) (*Conn, error) {
 
 	for {
 		p.connsMu.Lock()
-		cn := p.popIdle()
+		cn := p.popIdle() // 取得连接池空闲队列
 		p.connsMu.Unlock()
 
 		if cn == nil {
 			break
 		}
 
-		if p.isStaleConn(cn) {
+		if p.isStaleConn(cn) { // stale 检查取出的连接是否大于配置的最大存在时间，或者运行的超时时间。
 			_ = p.CloseConn(cn)
 			continue
 		}
 
-		atomic.AddUint32(&p.stats.Hits, 1)
+		atomic.AddUint32(&p.stats.Hits, 1) // 记录连接复用次数
 		return cn, nil
 	}
 
-	atomic.AddUint32(&p.stats.Misses, 1)
+	atomic.AddUint32(&p.stats.Misses, 1) // 记录未从连接池中拿到连接次数
 
-	newcn, err := p.newConn(ctx, true)
+	newcn, err := p.newConn(ctx, true) // 未取得连接，及重新创建连接，并默认放入连接池中。
 	if err != nil {
-		p.freeTurn()
+		p.freeTurn() // 释放连接，把连接池工作队列中出队
 		return nil, err
 	}
 
@@ -298,14 +300,14 @@ func (p *ConnPool) waitTurn(ctx context.Context) error {
 }
 
 func (p *ConnPool) freeTurn() {
-	<-p.queue
+	<-p.queue // 出连接池工作队列
 }
 
 func (p *ConnPool) popIdle() *Conn {
 	if len(p.idleConns) == 0 {
 		return nil
 	}
-
+	// 空闲连接队列减一，并检查是否需要增加空闲连接
 	idx := len(p.idleConns) - 1
 	cn := p.idleConns[idx]
 	p.idleConns = p.idleConns[:idx]
@@ -314,23 +316,23 @@ func (p *ConnPool) popIdle() *Conn {
 	return cn
 }
 
-func (p *ConnPool) Put(cn *Conn) {
-	if cn.rd.Buffered() > 0 {
+func (p *ConnPool) Put(cn *Conn) { // 用完放回连接池
+	if cn.rd.Buffered() > 0 { // 还有写缓冲
 		internal.Logger.Printf("Conn has unread data")
 		p.Remove(cn, BadConnError{})
 		return
 	}
 
-	if !cn.pooled {
+	if !cn.pooled { // 若之前临时创建的连接，没有默认放入连接池属性的，会在这里被移除释放
 		p.Remove(cn, nil)
 		return
 	}
 
 	p.connsMu.Lock()
-	p.idleConns = append(p.idleConns, cn)
+	p.idleConns = append(p.idleConns, cn) // 放入连接池的空闲队列
 	p.idleConnsLen++
 	p.connsMu.Unlock()
-	p.freeTurn()
+	p.freeTurn() // 释放工作队列，标记为未工作状态
 }
 
 func (p *ConnPool) Remove(cn *Conn, reason error) {
