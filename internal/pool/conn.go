@@ -12,15 +12,15 @@ import (
 var noDeadline = time.Time{}
 
 type Conn struct {
-	netConn net.Conn
+	netConn net.Conn // 基于TCP的网络连接
 
-	rd *proto.Reader
-	wr *proto.Writer
+	rd *proto.Reader //根据redis协议实现的读
+	wr *proto.Writer //根据redis协议实现的写
 
-	Inited    bool
-	pooled    bool
-	createdAt time.Time
-	usedAt    int64 // atomic
+	Inited    bool      //是否完成初始化
+	pooled    bool      // 是否放进连接池
+	createdAt time.Time // 连接创建时间
+	usedAt    int64     // atomic，使用时间
 }
 
 func NewConn(netConn net.Conn) *Conn {

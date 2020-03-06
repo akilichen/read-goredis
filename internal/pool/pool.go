@@ -43,7 +43,7 @@ type Pooler interface {
 
 	Len() int
 	IdleLen() int
-	Stats() *Stats
+	Stats() *Stats //连接池统计信息
 
 	Close() error
 }
@@ -61,25 +61,25 @@ type Options struct {
 }
 
 type ConnPool struct {
-	opt *Options
+	opt *Options // 连接池配置
 
-	dialErrorsNum uint32 // atomic
+	dialErrorsNum uint32 // atomic，连接错误次数
 
-	lastDialErrorMu sync.RWMutex
-	lastDialError   error
+	lastDialErrorMu sync.RWMutex // 上一次连接错误锁，此为读写锁
+	lastDialError   error        // 上次连接错误信息
 
-	queue chan struct{}
+	queue chan struct{} // 连接池中的工作队列
 
-	connsMu      sync.Mutex
-	conns        []*Conn
-	idleConns    []*Conn
-	poolSize     int
-	idleConnsLen int
+	connsMu      sync.Mutex // 连接队列锁
+	conns        []*Conn    // 连接池队列
+	idleConns    []*Conn    // 空闲队列
+	poolSize     int        // 连接池大小
+	idleConnsLen int        //空闲队列长度
 
-	stats Stats
+	stats Stats //连接池统计
 
-	_closed  uint32 // atomic
-	closedCh chan struct{}
+	_closed  uint32        // atomic，连接池关闭标记 0为正常，1为关闭
+	closedCh chan struct{} // 连接关闭通知channel
 }
 
 var _ Pooler = (*ConnPool)(nil)
@@ -98,7 +98,7 @@ func NewConnPool(opt *Options) *ConnPool { // 初始化redis连接池
 
 	// 若连接池配置中指定了具体的空闲连接超时时间和检查空闲连接频率，启动一个协程用于清理空闲协程
 	if opt.IdleTimeout > 0 && opt.IdleCheckFrequency > 0 {
-		go p.reaper(opt.IdleCheckFrequency) // 清理协程
+		go p.reaper(opt.IdleCheckFrequency) // 清理协程 reaper == 收割
 	}
 
 	return p
@@ -263,20 +263,20 @@ func (p *ConnPool) getTurn() {
 	p.queue <- struct{}{}
 }
 
-func (p *ConnPool) waitTurn(ctx context.Context) error {
+func (p *ConnPool) waitTurn(ctx context.Context) error { //在设置的poolTimeout时间内等待有连接被调度
 	select {
-	case <-ctx.Done():
+	case <-ctx.Done(): // 检查上下文，快速检验错误，避免下面的预创建timer浪费不必要资源
 		return ctx.Err()
 	default:
 	}
 
 	select {
-	case p.queue <- struct{}{}: // ？
+	case p.queue <- struct{}{}: // 工作队列此时能被访问到，返回
 		return nil
 	default:
 	}
 
-	timer := timers.Get().(*time.Timer)
+	timer := timers.Get().(*time.Timer) // 若无连接调度，才开始创建timer，从池中取出一个时间片
 	timer.Reset(p.opt.PoolTimeout)
 
 	select {
@@ -287,10 +287,10 @@ func (p *ConnPool) waitTurn(ctx context.Context) error {
 		timers.Put(timer)
 		return ctx.Err()
 	case p.queue <- struct{}{}:
-		if !timer.Stop() {
+		if !timer.Stop() { //若timer还未结束，立刻在channel中出C，结束当前一轮轮转，开始下一轮，返回
 			<-timer.C
 		}
-		timers.Put(timer)
+		timers.Put(timer) // 时间同步池
 		return nil
 	case <-timer.C:
 		timers.Put(timer)
@@ -366,7 +366,7 @@ func (p *ConnPool) removeConn(cn *Conn) {
 }
 
 func (p *ConnPool) closeConn(cn *Conn) error {
-	if p.opt.OnClose != nil {
+	if p.opt.OnClose != nil { //如有自定义关闭函数，则调用，无则调用net.close函数关闭连接
 		_ = p.opt.OnClose(cn)
 	}
 	return cn.Close()
@@ -405,7 +405,7 @@ func (p *ConnPool) closed() bool {
 	return atomic.LoadUint32(&p._closed) == 1
 }
 
-func (p *ConnPool) Filter(fn func(*Conn) bool) error {
+func (p *ConnPool) Filter(fn func(*Conn) bool) error { //过滤设置条件的数据，将其从连接池中删除
 	var firstErr error
 	p.connsMu.Lock()
 	for _, cn := range p.conns {
@@ -496,23 +496,23 @@ func (p *ConnPool) reapStaleConn() *Conn {
 		return nil
 	}
 
-	p.idleConns = append(p.idleConns[:0], p.idleConns[1:]...)
-	p.idleConnsLen--
-	p.removeConn(cn)
+	p.idleConns = append(p.idleConns[:0], p.idleConns[1:]...) // 坏的连接从空闲队列中，取得新队列
+	p.idleConnsLen--                                          // 空闲连接数减一
+	p.removeConn(cn)                                          // 移除
 
 	return cn
 }
 
-func (p *ConnPool) isStaleConn(cn *Conn) bool {
+func (p *ConnPool) isStaleConn(cn *Conn) bool { // 检查连接是否需要被清理
 	if p.opt.IdleTimeout == 0 && p.opt.MaxConnAge == 0 {
 		return false
 	}
 
 	now := time.Now()
-	if p.opt.IdleTimeout > 0 && now.Sub(cn.UsedAt()) >= p.opt.IdleTimeout {
+	if p.opt.IdleTimeout > 0 && now.Sub(cn.UsedAt()) >= p.opt.IdleTimeout { // 设置的空闲连接超时 > 已空闲时间
 		return true
 	}
-	if p.opt.MaxConnAge > 0 && now.Sub(cn.createdAt) >= p.opt.MaxConnAge {
+	if p.opt.MaxConnAge > 0 && now.Sub(cn.createdAt) >= p.opt.MaxConnAge { // 连接设置的最大连接时间 > 已存在时间
 		return true
 	}
 
