@@ -300,7 +300,7 @@ func (c *baseClient) process(ctx context.Context, cmd Cmder) error {
 	return nil
 }
 
-func (c *baseClient) _process(ctx context.Context, cmd Cmder) error {
+func (c *baseClient) _process(ctx context.Context, cmd Cmder) error { //处理命令的写入redis
 	var lastErr error
 	for attempt := 0; attempt <= c.opt.MaxRetries; attempt++ {
 		if attempt > 0 {

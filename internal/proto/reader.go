@@ -160,7 +160,7 @@ func (r *Reader) readStringReply(line []byte) (string, error) {
 	return util.BytesToString(b[:replyLen]), nil
 }
 
-func (r *Reader) ReadArrayReply(m MultiBulkParse) (interface{}, error) {
+func (r *Reader) ReadArrayReply(m MultiBulkParse) (interface{}, error) { // 读取批量命令的返回结果
 	line, err := r.ReadLine()
 	if err != nil {
 		return nil, err

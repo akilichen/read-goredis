@@ -55,7 +55,7 @@ func writeCmd(wr *proto.Writer, cmd Cmder) error {
 	return wr.WriteArgs(cmd.Args())
 }
 
-func cmdString(cmd Cmder, val interface{}) string {
+func cmdString(cmd Cmder, val interface{}) string { // 将命令slice转化命令string
 	ss := make([]string, 0, len(cmd.Args()))
 	for _, arg := range cmd.Args() {
 		ss = append(ss, fmt.Sprint(arg))
@@ -306,7 +306,7 @@ type SliceCmd struct {
 	val []interface{}
 }
 
-var _ Cmder = (*SliceCmd)(nil)
+var _ Cmder = (*SliceCmd)(nil) //用下划线来断言cmder变量是否全部实现了sliceCmd结构，若无则会在编译报错，不错的检错方法。
 
 func NewSliceCmd(args ...interface{}) *SliceCmd {
 	return &SliceCmd{
